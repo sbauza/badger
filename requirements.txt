@@ -8,3 +8,4 @@ qrcode
 git+git://github.com/ojii/pymaging.git#egg=pymaging
 git+git://github.com/ojii/pymaging-png.git#egg=pymaging-png
 Jinja2
+cairosvg
