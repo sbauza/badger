@@ -71,10 +71,35 @@ class YurplanAPI(object):
         if r.ok:
             return r.json()['data']
 
-    def get_badge_info(self, conf_id='11201'):
+    def get_badge_info(self, conf_id='11201', speaker_id='12310',
+                       sponsor_id='12322',
+                       staff_id='12309',
+                       exceptions=None):
+        """Obtain list of badges from the different ticket types.
+
+        :param exception_list: Dict w/ key == token and value == expected type
+        """
+
         tickets = self.tickets()
-        conf_tickets = [t for t in tickets if t['type']['id'] == conf_id]
+        conf_tickets = []
+        for ticket in tickets:
+            if ticket['type']['id'] == conf_id:
+                ticket['_type'] = 'ATTENDEE'
+            if ticket['type']['id'] == speaker_id:
+                ticket['_type'] = 'SPEAKER'
+            if ticket['type']['id'] == sponsor_id:
+                ticket['_type'] = 'SPONSOR'
+            if ticket['type']['id'] == staff_id:
+                ticket['_type'] = 'STAFF'
+            if ticket['token'] in exceptions.keys():
+                ticket['_type'] = exceptions.get(ticket['token'],
+                                                 ticket.get('_type',
+                                                            'ATTENDEE'))
+            if ticket.get('_type'):
+                conf_tickets.append(ticket)
+
         return [{'firstname': t['firstname'],
                  'lastname': t['lastname'],
-                 'token': t['token']}
+                 'token': t['token'],
+                 'type': t['_type']}
                 for t in conf_tickets]

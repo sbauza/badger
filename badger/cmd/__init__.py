@@ -32,14 +32,26 @@ def main():
     template_file = CONF.find_file(CONF.badge_template)
     if not template_file:
         raise Exception('file not found')
+    # TODO(sbauza): I really need to move that one in an opt...
+    exceptions = {
+        # Remy Sanlaville
+        '63431120112828696': 'STAFF',
+        # Clement Bouillier
+        '6343112016581271': 'SPEAKER',
+        # Jean Helou
+        '6343112013847003': 'SPEAKER',
+        }
     yurplan_api = api.YurplanAPI()
-    conf_people = yurplan_api.get_badge_info()
+    conf_people = yurplan_api.get_badge_info(exceptions=exceptions)
     template = badge.SnowCampTemplate(template=template_file)
     for person in conf_people:
         filename = 'temp/qr_temp.png'
         barcode.BarCode(person['token']).save(filename)
-        badge.SnowCampBadge(person['firstname'], person['lastname'],
-                            filename, template).save()
+        badge.SnowCampBadge(firstname=person['firstname'],
+                            lastname=person['lastname'],
+                            token=person['token'],
+                            ticket_type=person['type'],
+                            qr=filename, template=template).save()
 
 if __name__ == 'main':
     sys.exit(main())

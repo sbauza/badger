@@ -38,22 +38,27 @@ class SnowCampBadge(object):
                 return "data:image/png;base64," + base64.b64encode(
                     qr_fd.read())
 
-    def __init__(self, firstname, lastname, qr, template=None):
+    def __init__(self, firstname, lastname, qr, token, ticket_type='ATTENDEE',
+                 template=None):
         self.template = (template if template is not None
                          else SnowCampTemplate())
         self.firstname = firstname.title()
         self.lastname = lastname.title()
         self.qr = self._handle_qr(qr)
+        self.token = token
+        self.type = ticket_type.upper()
 
         self.badge = self.template.render(firstname=self.firstname,
                                           lastname=self.lastname,
+                                          type=self.type,
                                           qr=self.qr).encode('utf-8')
 
     def save(self, filename=None, output='pdf'):
         if filename is None:
-            filename = '%(firstname)s_%(lastname)s.svg' % {
+            filename = '%(firstname)s_%(lastname)s_%(token)s.svg' % {
                 'firstname': self.firstname,
-                'lastname': self.lastname}
+                'lastname': self.lastname,
+                'token': self.token}
         with open(filename, 'w+') as fp:
             fp.write(self.badge)
         if output == 'pdf':
