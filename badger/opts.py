@@ -11,24 +11,9 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-import qrcode
-from qrcode.image.pure import PymagingImage
+from badger import cmd
+from badger.yurplan import api
 
 
-class BarCode(object):
-    def __init__(self, data):
-        self.data = data
-        self.qr = qrcode.QRCode(
-            version=1,
-            error_correction=qrcode.constants.ERROR_CORRECT_H,
-            )
-        self.qr.add_data(self.data)
-        self.qr.make()
-        self.img = self.qr.make_image(image_factory=PymagingImage)
-
-    def show(self):
-        self.qr.print_ascii()
-
-    def save(self, filename='test.png'):
-        with open(filename, 'wb') as wd:
-            self.img.save(wd)
+def list_opts():
+    return [('yurplan', api.opts), ('DEFAULT', cmd.cli_opts)]

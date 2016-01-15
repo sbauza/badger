@@ -19,34 +19,45 @@ import jinja2
 
 
 class SnowCampTemplate(object):
-    def __init__(self, template='./snowcamp2016.svg'):
+    def __init__(self, template='snowcamp2016.svg.jinja2'):
         template_path, template_name = os.path.split(template)
         env = jinja2.Environment(loader=jinja2.FileSystemLoader(template_path))
         self.template = env.get_template(template_name)
 
-    def badge(self, firstname, surname, qr_file):
-        return SnowCampBadge(self.template, firstname, surname, qr_file)
+    def render(self, *args, **kwargs):
+        return self.template.render(*args, **kwargs)
 
 
 class SnowCampBadge(object):
-    def __init__(self, template, firstname, lastname, qr_file):
-        self.template = template
-        self.firstname = firstname
-        self.lastname = lastname
-        self.qr_file = qr_file
-        with open(self.qr_file, "rb") as qr:
-            qr_base64 = base64.b64encode(qr.read())
+
+    @staticmethod
+    def _handle_qr(qr):
+        # we suppose a filename
+        if isinstance(qr, str) and os.path.exists(qr):
+            with open(qr, "rb") as qr_fd:
+                return "data:image/png;base64," + base64.b64encode(
+                    qr_fd.read())
+
+    def __init__(self, firstname, lastname, qr, template=None):
+        self.template = (template if template is not None
+                         else SnowCampTemplate())
+        self.firstname = firstname.title()
+        self.lastname = lastname.title()
+        self.qr = self._handle_qr(qr)
+
         self.badge = self.template.render(firstname=self.firstname,
                                           lastname=self.lastname,
-                                          qr_base64=qr_base64).encode('utf-8')
+                                          qr=self.qr).encode('utf-8')
 
-    def save(self, filename=None):
+    def save(self, filename=None, output='pdf'):
         if filename is None:
             filename = '%(firstname)s_%(lastname)s.svg' % {
                 'firstname': self.firstname,
                 'lastname': self.lastname}
         with open(filename, 'w+') as fp:
             fp.write(self.badge)
+        if output == 'pdf':
+            self.exportPDF(filename)
 
     @classmethod
     def exportPDF(cls, filename):

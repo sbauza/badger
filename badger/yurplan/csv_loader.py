@@ -11,24 +11,22 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-import qrcode
-from qrcode.image.pure import PymagingImage
+import os
+# py2 stdlib csv is not working with unicode
+import unicodecsv as csv
 
+class YurplanCSV(object):
+    def __init__(self, csvfile):
+        if os.path.exists(csvfile):
+            with open(csvfile, 'rt') as fd:
+                reader = csv.DictReader(fd, delimiter=';')
+                self.rows = [row for row in reader]
+        else:
+            raise Exception("%s not found" % csvfile)
 
-class BarCode(object):
-    def __init__(self, data):
-        self.data = data
-        self.qr = qrcode.QRCode(
-            version=1,
-            error_correction=qrcode.constants.ERROR_CORRECT_H,
-            )
-        self.qr.add_data(self.data)
-        self.qr.make()
-        self.img = self.qr.make_image(image_factory=PymagingImage)
+    def tickets(self):
+        if not self.rows:
+            raise Exception("csv not loaded")
+        return [row for row in self.rows if ]
 
-    def show(self):
-        self.qr.print_ascii()
-
-    def save(self, filename='test.png'):
-        with open(filename, 'wb') as wd:
-            self.img.save(wd)
+myfile = YurplanCSV('./snowcamp2016.csv')

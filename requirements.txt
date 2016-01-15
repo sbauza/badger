@@ -7,5 +7,11 @@ pbr>=1.6
 qrcode
 git+git://github.com/ojii/pymaging.git#egg=pymaging
 git+git://github.com/ojii/pymaging-png.git#egg=pymaging-png
+#Templating for badge
 Jinja2
 cairosvg
+
+requests
+unicodecsv
+
+oslo.config

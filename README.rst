@@ -13,7 +13,14 @@ Note that this is a hard requirement.
 * Source: http://github.com/sbauza/badger
 * Bugs: github issues...
 
-Features
+Usage
 --------
 
-* TODO
+git clone http://github.com/sbauza/badger
+cd badger
+virtualenv build
+source build/bin/activate
+pip install -r requirements (an error should be done, it's okay)
+
+<copy etc/badger.conf and edit the creds>
+badger --badge_template etc/snowcamp2016.svg.jinja2 --config-file badger.conf.secret
