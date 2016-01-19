@@ -17,6 +17,12 @@ import os
 import cairosvg
 import jinja2
 
+_COLORS = {
+    'STAFF': "#ee0000",
+    'SPONSOR': "#00ee00",
+    'SPEAKER': "#00b3ff",
+    'ATTENDEE': "#e0e0e0"}
+
 
 class SnowCampTemplate(object):
     def __init__(self, template='snowcamp2016.svg.jinja2'):
@@ -51,7 +57,9 @@ class SnowCampBadge(object):
         self.badge = self.template.render(firstname=self.firstname,
                                           lastname=self.lastname,
                                           type=self.type,
-                                          qr=self.qr).encode('utf-8')
+                                          qr=self.qr,
+                                          color=_COLORS.get(self.type)
+                                          ).encode('utf-8')
 
     def save(self, filename=None, output='pdf'):
         if filename is None:

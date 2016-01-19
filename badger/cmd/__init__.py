@@ -41,8 +41,17 @@ def main():
         # Jean Helou
         '6343112013847003': 'SPEAKER',
         }
+    corrections = {
+        '634311201230215': ('Patrice', 'Laporte'),
+        '634311201397200': ('Pierre-Yves', 'Boyer'),
+        '63431120123069863': ('', ''),
+        '63431232223199949': ('', ''),
+        '63431230923287652': ('', ''),
+        '63431231023356343': ('', ''),
+    }
     yurplan_api = api.YurplanAPI()
-    conf_people = yurplan_api.get_badge_info(exceptions=exceptions)
+    conf_people = yurplan_api.get_badge_info(exceptions=exceptions,
+                                             corrections=corrections)
     template = badge.SnowCampTemplate(template=template_file)
     for person in conf_people:
         filename = 'temp/qr_temp.png'

@@ -74,7 +74,8 @@ class YurplanAPI(object):
     def get_badge_info(self, conf_id='11201', speaker_id='12310',
                        sponsor_id='12322',
                        staff_id='12309',
-                       exceptions=None):
+                       exceptions=None,
+                       corrections={}):
         """Obtain list of badges from the different ticket types.
 
         :param exception_list: Dict w/ key == token and value == expected type
@@ -96,6 +97,10 @@ class YurplanAPI(object):
                                                  ticket.get('_type',
                                                             'ATTENDEE'))
             if ticket.get('_type'):
+                if ticket['token'] in corrections:
+                    (firstname, lastname) = corrections[ticket['token']]
+                    ticket['firstname'] = firstname
+                    ticket['lastname'] = lastname
                 conf_tickets.append(ticket)
 
         return [{'firstname': t['firstname'],
