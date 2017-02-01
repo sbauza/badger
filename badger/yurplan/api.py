@@ -13,10 +13,11 @@
 
 from oslo_config import cfg
 import requests
+import yaml
 
 CONF = cfg.CONF
 
-opts = [
+api_opts = [
     cfg.StrOpt('api_key',
                default='mykey',
                secret=True,
@@ -31,7 +32,8 @@ opts = [
                help='Password'),
 ]
 
-CONF.register_opts(opts, 'yurplan')
+
+CONF.register_opts(api_opts, 'yurplan')
 
 
 YURPLAN_ENDPOINT = 'http://yurplan.com/api.php'
@@ -71,26 +73,36 @@ class YurplanAPI(object):
         if r.ok:
             return r.json()['data']
 
-    def get_badge_info(self, conf_id='11201', speaker_id='12310',
-                       sponsor_id='12322',
-                       staff_id='12309',
-                       exceptions=None,
-                       corrections={}):
+    def get_badge_info(self, conference_file):
         """Obtain list of badges from the different ticket types.
 
         :param exception_list: Dict w/ key == token and value == expected type
         """
+        with open(conference_file, 'r') as conf_stream:
+            try:
+                conf_details = yaml.load(conf_stream)
+            except yaml.YAMLError:
+                raise Exception(
+                    "%s is not a correct YAML file" % conference_file)
 
-        tickets = self.tickets()
+        conf_id = conf_details.get('conference', {}).get('id')
+        speaker_ids = conf_details.get('participants', {}).get('speaker_ids')
+        sponsor_ids = conf_details.get('participants', {}).get('sponsor_ids')
+        staff_ids = conf_details.get('participants', {}).get('staff_ids')
+        attendee_ids = conf_details.get('participants', {}).get('attendee_ids')
+        corrections = conf_details.get('corrections') or {}
+        exceptions = conf_details.get('exceptions') or {}
+
+        tickets = self.tickets(conf_id)
         conf_tickets = []
         for ticket in tickets:
-            if ticket['type']['id'] == conf_id:
+            if int(ticket['type']['id']) in attendee_ids:
                 ticket['_type'] = 'ATTENDEE'
-            if ticket['type']['id'] == speaker_id:
+            if int(ticket['type']['id']) in speaker_ids:
                 ticket['_type'] = 'SPEAKER'
-            if ticket['type']['id'] == sponsor_id:
+            if int(ticket['type']['id']) in sponsor_ids:
                 ticket['_type'] = 'SPONSOR'
-            if ticket['type']['id'] == staff_id:
+            if int(ticket['type']['id']) in staff_ids:
                 ticket['_type'] = 'STAFF'
             if ticket['token'] in exceptions.keys():
                 ticket['_type'] = exceptions.get(ticket['token'],

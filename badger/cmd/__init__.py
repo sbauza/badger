@@ -22,6 +22,8 @@ CONF = cfg.CONF
 cli_opts = [
     cfg.StrOpt('badge_template', default='snowcamp2016.svg.jinja2',
                help='SVG template for badges'),
+    cfg.StrOpt('conference_file', default='snowcamp2017.yaml',
+               help='YAML file describing conference details'),
 ]
 
 CONF.register_cli_opts(cli_opts)
@@ -31,27 +33,12 @@ def main():
     CONF(sys.argv[1:], project='badger', prog='main')
     template_file = CONF.find_file(CONF.badge_template)
     if not template_file:
-        raise Exception('file not found')
-    # TODO(sbauza): I really need to move that one in an opt...
-    exceptions = {
-        # Remy Sanlaville
-        '63431120112828696': 'STAFF',
-        # Clement Bouillier
-        '6343112016581271': 'SPEAKER',
-        # Jean Helou
-        '6343112013847003': 'SPEAKER',
-        }
-    corrections = {
-        '634311201230215': ('Patrice', 'Laporte'),
-        '634311201397200': ('Pierre-Yves', 'Boyer'),
-        '63431120123069863': ('', ''),
-        '63431232223199949': ('', ''),
-        '63431230923287652': ('', ''),
-        '63431231023356343': ('', ''),
-    }
+        raise Exception('Template file not found')
+    conference_file = CONF.find_file(CONF.conference_file)
+    if not conference_file:
+        raise Exception('Conference file not found')
     yurplan_api = api.YurplanAPI()
-    conf_people = yurplan_api.get_badge_info(exceptions=exceptions,
-                                             corrections=corrections)
+    conf_people = yurplan_api.get_badge_info(conference_file=conference_file)
     template = badge.SnowCampTemplate(template=template_file)
     for person in conf_people:
         filename = 'temp/qr_temp.png'

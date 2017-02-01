@@ -1,0 +1,9 @@
+conference:
+  id: 11544
+participants:
+  attendee_ids: [23382, 23385]
+  speaker_ids: [30412]
+  sponsor_ids: [29821, 28604]
+  staff_ids: [31156]
+exceptions:
+corrections:
