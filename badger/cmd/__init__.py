@@ -24,6 +24,8 @@ cli_opts = [
                help='SVG template for badges'),
     cfg.StrOpt('conference_file', default='snowcamp2017.yaml',
                help='YAML file describing conference details'),
+    cfg.StrOpt('destination_path',
+               help='Path where badges are built'),
 ]
 
 CONF.register_cli_opts(cli_opts)
@@ -47,7 +49,7 @@ def main():
                             lastname=person['lastname'],
                             token=person['token'],
                             ticket_type=person['type'],
-                            qr=filename, template=template).save()
-
+                            qr=filename, template=template).save(
+                                dest_path=CONF.destination_path)
 if __name__ == 'main':
     sys.exit(main())

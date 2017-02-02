@@ -61,12 +61,17 @@ class SnowCampBadge(object):
                                           color=_COLORS.get(self.type)
                                           ).encode('utf-8')
 
-    def save(self, filename=None, output='pdf'):
+    def save(self, dest_path=None, filename=None, output='pdf'):
         if filename is None:
             filename = '%(firstname)s_%(lastname)s_%(token)s.svg' % {
                 'firstname': self.firstname,
                 'lastname': self.lastname,
                 'token': self.token}
+        if dest_path:
+            if not os.path.exists(dest_path):
+                raise Exception("Destination directory doesn't exist: %s" %
+                                dest_path)
+            filename = os.path.join(dest_path, filename)
         with open(filename, 'w+') as fp:
             fp.write(self.badge)
         if output == 'pdf':
