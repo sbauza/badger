@@ -16,7 +16,6 @@ from oslo_config import cfg
 
 from badger import badge
 from badger import barcode
-from badger.yurplan import api
 
 CONF = cfg.CONF
 cli_opts = [
@@ -29,7 +28,10 @@ cli_opts = [
     cfg.StrOpt('qr', default='',
                help='QR'),
     cfg.StrOpt('type', default='ATTENDEE',
-               help='QR'),]
+               help='QR'),
+    cfg.StrOpt('destination_path',
+               help='Path where badges are built'),
+]
 
 CONF.register_cli_opts(cli_opts)
 
@@ -51,7 +53,8 @@ def main():
                         lastname=person['lastname'],
                         token=person['token'],
                         ticket_type=person['type'],
-                        qr=filename, template=template).save()
+                        qr=filename, template=template).save(
+                            dest_path=CONF.destination_path)
 
 if __name__ == 'main':
     sys.exit(main())
