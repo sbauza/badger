@@ -51,23 +51,5 @@ def main():
                             ticket_type=person['type'],
                             qr=filename, template=template).save(
                                 dest_path=CONF.destination_path)
-    # TODO(sbauza): Make that automatically using YAML
-    # Sponsors
-    for ticket_sup in range(30):
-        token = "123_%s" % ticket_sup
-        filename = 'temp/qr_temp.png'
-        barcode.BarCode(token).save(filename)
-        if ticket_sup % 3 == 0:
-            ttype = "SPONSOR"
-        if ticket_sup % 3 == 1:
-            ttype = "SPEAKER"
-        if ticket_sup % 3 == 2:
-            ttype = "ATTENDEE"
-        badge.SnowCampBadge(firstname="",
-                            lastname="",
-                            token=token,
-                            ticket_type=ttype,
-                            qr=filename, template=template).save(
-                                dest_path=CONF.destination_path)
 if __name__ == 'main':
     sys.exit(main())
